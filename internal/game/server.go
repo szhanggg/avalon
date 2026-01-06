@@ -54,6 +54,7 @@ func (s *Server) NewRoom() *Room {
 				unregister: make(chan *Player),
 			}
 			s.AddRoom(room)
+			room.run()
 			return room
 		}
 	}

@@ -1,5 +1,7 @@
 package game
 
+import "github.com/gorilla/websocket"
+
 type Message struct {
 	content []byte
 	player  *Player
@@ -41,5 +43,18 @@ func (r *Room) run() {
 			}
 		}
 	}
+}
 
+func (r *Room) newPlayer(ws *websocket.Conn, name string) {
+	player := &Player{
+		room: r,
+		ID:   "placeholder",
+		name: name,
+		send: make(chan []byte, 256),
+		ws:   ws,
+	}
+	r.register <- player
+
+	go player.readPump()
+	go player.writePump()
 }

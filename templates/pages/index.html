@@ -3,8 +3,10 @@
 <p>Online port of <b>The Resistance: Avalon</b></p>
 <div>
   <button hx-post="/create" hx-trigger="click">Host Game</button>
-  <form hx-get="/room">
-    <input name="room-id" />
+  <form hx-get="/join" hx-target="#error" hx-swap="outerHTML">
+    <div id="error"></div>
+    <label>Room ID</label>
+    <input name="roomID" placeholder="ABCD" />
     <button type="submit">Join Game</button>
   </form>
 </div>

@@ -96,20 +96,6 @@ func (p *Player) writePump() {
 	}
 }
 
-func newPlayer(room *Room, ws *websocket.Conn, name string) {
-	player := &Player{
-		room: room,
-		ID:   "placeholder",
-		name: name,
-		send: make(chan []byte, 256),
-		ws:   ws,
-	}
-	room.register <- player
-
-	go player.readPump()
-	go player.writePump()
-}
-
 func (p *Player) cleanup() {
 	p.room.unregister <- p
 	p.ws.Close()

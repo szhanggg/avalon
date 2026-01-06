@@ -25,6 +25,7 @@ var upgrader = websocket.Upgrader{
 }
 
 var templates = make(map[string]*template.Template)
+var fragments = template.Must(template.ParseFS(files, "templates/fragments.html"))
 
 // setup game server
 var s = game.NewServer()
@@ -47,11 +48,40 @@ func initTemplates() {
 	}
 }
 
+// room setup logic
+
 func createRoom(w http.ResponseWriter, r *http.Request) {
+
+	room := s.NewRoom()
+	w.Header().Set("HX-Redirect", "/room/"+room.ID)
+	w.WriteHeader(http.StatusNoContent)
 
 }
 
 func getRoom(w http.ResponseWriter, r *http.Request) {
+	roomId := chi.URLParam(r, "roomId")
+	room, ok := s.GetRoom(roomId)
+	if !ok {
+		// TODO: Handle room not found
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	templates["room.html"].ExecuteTemplate(w, "base", room)
+
+}
+
+func joinRoom(w http.ResponseWriter, r *http.Request) {
+	roomID := r.FormValue("roomID")
+	_, ok := s.GetRoom(roomID)
+	if !ok {
+		// TODO: Room not found
+		fragments.ExecuteTemplate(w, "error", "That room doesn't exist!")
+	}
+	w.Header().Set("HX-Redirect", "/room/"+roomID)
+}
+
+func socketHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
@@ -74,7 +104,10 @@ func main() {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		templates["index.html"].ExecuteTemplate(w, "base", nil)
 	})
+	r.Get("/room/{roomId}", getRoom)
+	r.Get("/join", joinRoom)
 	r.Post("/create", createRoom)
+	r.Get("/ws", socketHandler)
 
 	log.Fatal(http.ListenAndServe(("localhost:8080"), r))
 
