@@ -1,1 +1,12 @@
-{{define "page"}} Room {{.ID}} {{end}}
+{{define "page"}}
+<div hx-ext="ws" ws-connect="/ws/{{.Room.ID}}">
+  Room {{.Room.ID}}
+  <div id="player-list">{{range .Room.Players}} {{.Name}} {{end}}</div>
+  <form ws-send>
+    <label>Enter your name</label>
+    <input name="action" type="hidden" value="register-player" />
+    <input name="name" />
+    <button type="submit">Submit</button>
+  </form>
+</div>
+{{end}}

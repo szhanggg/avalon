@@ -10,7 +10,7 @@ import (
 type Player struct {
 	room *Room
 	ID   string
-	name string
+	Name string
 	send chan []byte
 	ws   *websocket.Conn
 }
@@ -34,7 +34,7 @@ var (
 	space   = []byte{' '}
 )
 
-func (p *Player) readPump() {
+func (p *Player) ReadPump() {
 	defer p.cleanup()
 
 	p.ws.SetReadLimit(maxMessageSize)
@@ -56,7 +56,7 @@ func (p *Player) readPump() {
 
 }
 
-func (p *Player) writePump() {
+func (p *Player) WritePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
@@ -94,6 +94,10 @@ func (p *Player) writePump() {
 			}
 		}
 	}
+}
+
+func (p *Player) AttachSocket(ws *websocket.Conn) {
+	p.ws = ws
 }
 
 func (p *Player) cleanup() {

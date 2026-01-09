@@ -48,13 +48,14 @@ func (s *Server) NewRoom() *Room {
 			room := &Room{
 				ID:         newId,
 				Players:    make(map[string]*Player),
+				Host:       nil,
 				State:      NewGameState(),
 				broadcast:  make(chan Message),
 				register:   make(chan *Player),
 				unregister: make(chan *Player),
 			}
 			s.AddRoom(room)
-			room.run()
+			go room.run()
 			return room
 		}
 	}
